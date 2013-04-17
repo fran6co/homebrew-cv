@@ -37,12 +37,18 @@ class Pcl < Formula
     boost149_include = File.join(boost149_base, 'include')
 
     args = std_cmake_args + %W[
+      -DBoost_INCLUDE_DIR=#{boost149_include}
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DCMAKE_BUILD_TYPE:STRING=Release
       -DBUILD_SHARED_LIBS:BOOL=TRUE
+      -DBUILD_TESTS:BOOL=FALSE
       -DBUILD_global_tests:BOOL=FALSE
       -DBUILD_apps:BOOL=ON
-      -DBoost_INCLUDE_DIR=#{boost149_include}
+      -DBUILD_app_3d_rec_framework:BOOL=ON
+      -DBUILD_app_in_hand_scanner:BOOL=ON
+      -DBUILD_app_point_cloud_editor:BOOL=ON
+      -DBUILD_examples:BOOL=ON
+      -DBUILD_simulation:BOOL=ON
     ]
 
     if build.with? 'openni'
