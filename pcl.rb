@@ -51,7 +51,7 @@ class Pcl < Formula
       -DBUILD_app_point_cloud_editor:BOOL=ON
       -DBUILD_app_modeler:BOOL=ON
       -DBUILD_app_cloud_composer:BOOL=OFF
-      -DBUILD_simulation:BOOL=ON
+      -DBUILD_simulation:BOOL=OFF
     ]
 
     if build.with? 'examples'
