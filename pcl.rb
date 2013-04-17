@@ -12,6 +12,7 @@ class Pcl < Formula
     cause "Compilation fails with clang"
   end
 
+  option 'with-qt', 'Build the Qt4 backend for examples'
   option 'with-openni', 'Enable support for OpenNI.'
 
   depends_on 'cmake' => :build
@@ -21,7 +22,11 @@ class Pcl < Formula
   depends_on 'eigen'
   depends_on 'flann'
   depends_on 'cminpack'
-  depends_on 'vtk'
+  if build.with? 'qt'
+    depends_on 'vtk' => :qt
+  else
+    depends_on 'vtk'
+  end
   depends_on 'qhull'
   depends_on 'libusb'
   depends_on 'glew'
