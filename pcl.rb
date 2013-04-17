@@ -24,7 +24,7 @@ class Pcl < Formula
   depends_on 'flann'
   depends_on 'cminpack'
   if build.with? 'qt'
-    depends_on 'vtk' => :qt
+    depends_on 'vtk' => 'qt'
   else
     depends_on 'vtk'
   end
