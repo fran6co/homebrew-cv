@@ -42,7 +42,7 @@ class Pcl < Formula
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DCMAKE_BUILD_TYPE:STRING=Release
       -DBUILD_SHARED_LIBS:BOOL=TRUE
-      -DBUILD_documentation:BOOL=ON
+      -DBUILD_documentation:BOOL=OFF
       -DBUILD_TESTS:BOOL=FALSE
       -DBUILD_global_tests:BOOL=FALSE
       -DBUILD_apps:BOOL=ON
@@ -50,7 +50,7 @@ class Pcl < Formula
       -DBUILD_app_in_hand_scanner:BOOL=ON
       -DBUILD_app_point_cloud_editor:BOOL=ON
       -DBUILD_app_modeler:BOOL=ON
-      -DBUILD_app_cloud_composer:BOOL=ON
+      -DBUILD_app_cloud_composer:BOOL=OFF
       -DBUILD_simulation:BOOL=ON
     ]
 
