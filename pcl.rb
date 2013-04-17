@@ -42,6 +42,7 @@ class Pcl < Formula
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DCMAKE_BUILD_TYPE:STRING=Release
       -DBUILD_SHARED_LIBS:BOOL=TRUE
+      -DBUILD_documentation:BOOL=ON
       -DBUILD_TESTS:BOOL=FALSE
       -DBUILD_global_tests:BOOL=FALSE
       -DBUILD_apps:BOOL=ON
