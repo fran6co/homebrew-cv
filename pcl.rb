@@ -12,6 +12,7 @@ class Pcl < Formula
     cause "Compilation fails with clang"
   end
 
+  option 'examples'
   option 'with-qt', 'Build the Qt4 backend for examples'
   option 'with-openni', 'Enable support for OpenNI.'
 
@@ -47,9 +48,12 @@ class Pcl < Formula
       -DBUILD_app_3d_rec_framework:BOOL=ON
       -DBUILD_app_in_hand_scanner:BOOL=ON
       -DBUILD_app_point_cloud_editor:BOOL=ON
-      -DBUILD_examples:BOOL=ON
       -DBUILD_simulation:BOOL=ON
     ]
+
+    if build.with? 'examples'
+      args << "-DBUILD_examples:BOOL=ON"
+    end
 
     if build.with? 'openni'
       args << "-DOPENNI_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/ni"
