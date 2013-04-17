@@ -48,11 +48,15 @@ class Pcl < Formula
       -DBUILD_app_3d_rec_framework:BOOL=ON
       -DBUILD_app_in_hand_scanner:BOOL=ON
       -DBUILD_app_point_cloud_editor:BOOL=ON
+      -DBUILD_app_modeler:BOOL=ON
+      -DBUILD_app_cloud_composer:BOOL=ON
       -DBUILD_simulation:BOOL=ON
     ]
 
     if build.with? 'examples'
       args << "-DBUILD_examples:BOOL=ON"
+    else
+      args << "-DBUILD_examples:BOOL=OFF"
     end
 
     if build.with? 'openni'
