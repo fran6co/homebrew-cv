@@ -24,6 +24,7 @@ class Pcl < Formula
   depends_on 'vtk'
   depends_on 'qhull'
   depends_on 'libusb'
+  depends_on 'glew'
   depends_on 'totakke/openni/openni' if build.with? 'openni'
 
   def install
@@ -31,6 +32,7 @@ class Pcl < Formula
     boost149_include = File.join(boost149_base, 'include')
 
     args = std_cmake_args + %W[
+      -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DCMAKE_BUILD_TYPE:STRING=Release
       -DBUILD_SHARED_LIBS:BOOL=TRUE
       -DBUILD_global_tests:BOOL=FALSE
