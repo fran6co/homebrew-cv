@@ -19,6 +19,7 @@ class Opencv < Formula
   option 'with-qt',  'Build the Qt4 backend to HighGUI'
   option 'with-tbb', 'Enable parallel code in OpenCV using Intel TBB'
   option 'with-opencl', 'Enable gpu code in OpenCV using OpenCL'
+  option 'with-ffmpeg', 'Enable ffmpeg video input'
   option 'with-openni', 'Enable support for OpenNI.'
 
   depends_on 'cmake' => :build
@@ -30,6 +31,8 @@ class Opencv < Formula
   depends_on 'jasper'  => :optional
   depends_on 'tbb'     => :optional
   depends_on 'qt'      => :optional
+  depends_on 'ffmpeg'  => :optional
+  depends_on 'openexr' => :optional
   depends_on 'totakke/openni/openni' if build.with? 'openni'
   depends_on :libpng
 
@@ -50,8 +53,10 @@ class Opencv < Formula
       -DBUILD_PNG=OFF
       -DBUILD_JPEG=OFF
       -DBUILD_JASPER=OFF
+      -DBUILD_OPENEXR=OFF
       -DBUILD_TESTS=OFF
       -DBUILD_PERF_TESTS=OFF
+      -DENABLE_PRECOMPILED_HEADERS=ON
     ]
     if build.build_32_bit?
       args << "-DCMAKE_OSX_ARCHITECTURES=i386"
@@ -61,7 +66,16 @@ class Opencv < Formula
     args << '-DWITH_QT=ON' if build.with? 'qt'
     args << '-DWITH_TBB=ON' if build.with? 'tbb'
     args << '-DWITH_OPENCL=ON' if build.with? 'opencl'
+    args << '-DWITH_FFMPEG=ON' if build.with? 'ffmpeg'
     args << '-DWITH_OPENNI=ON' if build.with? 'openni'
+
+    # Check for SIMD code support
+    if ENV.compiler == :clang
+      # not sure how to check SSSE3 hardware support but this should be safe
+      args << '-DENABLE_SSSE3=ON' << '-DENABLE_SSE41=ON' if (Hardware::CPU.family == :penryn or Hardware::CPU.sse4?) and ENV.compiler == :clang
+      args << '-DENABLE_SSE42=ON' if Hardware::CPU.sse4? and ENV.compiler == :clang
+      args << '-DENABLE_AVX=ON' if Hardware::CPU.avx? and ENV.compiler == :clang
+    end
 
     # The CMake `FindPythonLibs` Module is dumber than a bag of hammers when
     # more than one python installation is available---for example, it clings
