@@ -16,12 +16,13 @@ class Pcl < Formula
   depends_on 'pkg-config' => :build
 
   if build.head?
+    version '1.7.0'
     depends_on 'boost'
   else
     depends_on 'boost149'
 
     fails_with :clang do
-      cause "Compilation fails with clang"
+      cause "Compilation fails with clang on 1.6.0"
     end
   end
 
