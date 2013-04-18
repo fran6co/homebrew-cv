@@ -48,7 +48,7 @@ class Pcl < Formula
       -DBUILD_apps:BOOL=ON
       -DBUILD_app_3d_rec_framework:BOOL=ON
       -DBUILD_app_in_hand_scanner:BOOL=ON
-      -DBUILD_app_point_cloud_editor:BOOL=ON
+      -DBUILD_app_point_cloud_editor:BOOL=OFF
       -DBUILD_app_modeler:BOOL=ON
       -DBUILD_app_cloud_composer:BOOL=OFF
       -DBUILD_simulation:BOOL=OFF
