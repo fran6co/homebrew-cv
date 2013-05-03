@@ -6,7 +6,7 @@ class Pcl < Formula
   url 'http://downloads.sourceforge.net/project/pointclouds/1.6.0/PCL-1.6.0-Source.tar.bz2'
   sha1 '45a2e155d7faf5901abe609fd40d5f1659015e9e'
 
-  head 'https://github.com/PointCloudLibrary/pcl.git'
+  head 'https://github.com/PointCloudLibrary/pcl.git', :revision => '25cd0bd12ca79710c8e3aadac669bbea635e73aa'
 
   option 'examples'
   option 'with-qt', 'Build the Qt4 backend for examples'
@@ -60,7 +60,7 @@ class Pcl < Formula
       -DBUILD_app_point_cloud_editor:BOOL=OFF
       -DBUILD_app_modeler:BOOL=ON
       -DBUILD_app_cloud_composer:BOOL=OFF
-      -DBUILD_simulation:BOOL=ON
+      -DBUILD_simulation:BOOL=OFF
     ]
 
     if !build.head?
