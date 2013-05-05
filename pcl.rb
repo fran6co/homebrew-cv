@@ -8,9 +8,10 @@ class Pcl < Formula
 
   head 'https://github.com/PointCloudLibrary/pcl.git', :revision => '25cd0bd12ca79710c8e3aadac669bbea635e73aa'
 
-  option 'examples'
-  option 'with-qt', 'Build the Qt4 backend for examples'
+  option 'examples', 'Build pcl examples.'
+  option 'with-qt', 'Enable support for Qt4 backend.'
   option 'with-openni', 'Enable support for OpenNI.'
+  option 'without-tools', 'Build without tools.'
 
   depends_on 'cmake' => :build
   depends_on 'pkg-config' => :build
@@ -36,9 +37,9 @@ class Pcl < Formula
   depends_on 'cminpack'
 
   if build.with? 'qt'
-    depends_on 'vtk' => 'qt'
+    depends_on 'vtk' => [:recommended,'qt']
   else
-    depends_on 'vtk'
+    depends_on 'vtk' => :recommended
   end
 
   depends_on 'qhull'
@@ -69,6 +70,10 @@ class Pcl < Formula
       args <<  "-DBoost_INCLUDE_DIR=#{boost149_include}"
     end
 
+    if build.without? 'tools'
+      args << "-DBUILD_tools:BOOL=OFF"
+    end
+
     if build.with? 'examples'
       args << "-DBUILD_examples:BOOL=ON"
     else
@@ -77,6 +82,16 @@ class Pcl < Formula
 
     if build.with? 'openni'
       args << "-DOPENNI_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/ni"
+    else
+      args << "-DCMAKE_DISABLE_FIND_PACKAGE_OpenNI:BOOL=TRUE"
+    end
+
+    if build.without? 'qt'
+      args << "-DCMAKE_DISABLE_FIND_PACKAGE_Qt4:BOOL=TRUE"
+    end
+
+    if build.without? 'vtk'
+      args << "-DCMAKE_DISABLE_FIND_PACKAGE_VTK:BOOL=TRUE"
     end
 
     args << '..'
