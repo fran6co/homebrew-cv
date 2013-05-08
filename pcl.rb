@@ -6,7 +6,7 @@ class Pcl < Formula
   url 'http://downloads.sourceforge.net/project/pointclouds/1.6.0/PCL-1.6.0-Source.tar.bz2'
   sha1 '45a2e155d7faf5901abe609fd40d5f1659015e9e'
 
-  head 'https://github.com/PointCloudLibrary/pcl.git', :revision => '25cd0bd12ca79710c8e3aadac669bbea635e73aa'
+  head 'https://github.com/PointCloudLibrary/pcl.git'
 
   option 'examples', 'Build pcl examples.'
   option 'with-qt', 'Enable support for Qt4 backend.'
