@@ -22,7 +22,6 @@ class Pcl < Formula
   end
 
   if build.head?
-    version '1.7.0'
     depends_on 'boost'
   else
     depends_on 'boost149'
