@@ -8,17 +8,55 @@ class Pcl < Formula
 
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
-  option 'examples', 'Build pcl examples.'
+  option 'with-examples', 'Build pcl examples.'
+  option 'with-tests', 'Build pcl testes.'
   option 'with-qt', 'Enable support for Qt4 backend.'
   option 'with-openni', 'Enable support for OpenNI.'
   option 'without-tools', 'Build without tools.'
+  option 'without-apps', 'Build without apps.'
 
   depends_on 'cmake' => :build
   depends_on 'pkg-config' => :build
 
   def patches
-    # fixes simulation compilation with opengl
-    DATA
+    # wrong opengl headers
+    fix_glut_headers = [
+	"gpu/kinfu/tools/kinfu_app_sim.cpp",
+	"gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
+	"simulation/tools/sim_test_performance.cpp",
+	"simulation/tools/sim_test_simple.cpp",
+	"simulation/tools/simulation_io.hpp",
+    ]
+    fix_glu_headers = fix_glut_headers + [
+	"apps/in_hand_scanner/src/opengl_viewer.cpp",
+	"apps/point_cloud_editor/src/cloud.cpp",
+	"apps/point_cloud_editor/src/cloudEditorWidget.cpp",
+	"simulation/include/pcl/simulation/model.h",
+	"simulation/include/pcl/simulation/range_likelihood.h",
+	"simulation/src/range_likelihood.cpp",
+	"surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
+    ]
+    fix_gl_headers = fix_glu_headers + [
+	"apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
+	"apps/point_cloud_editor/src/select1DTool.cpp",
+	"simulation/include/pcl/simulation/sum_reduce.h",
+	"simulation/tools/sim_viewer.cpp",
+    ]
+    inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
+    inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
+    inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+
+    [
+      "https://github.com/fran6co/pcl/commit/0372ee18577a01f12b8c9b48e35666e1d77da1bf.patch",
+      "https://github.com/fran6co/pcl/commit/52f878ed83a04ecf28de78b207268fd1850b9266.patch",
+      "https://github.com/fran6co/pcl/commit/00443e118ba347e335324b9b4966abc7891afbc0.patch",
+      # fixes simulation compilation https://github.com/PointCloudLibrary/pcl/pull/127
+      "https://github.com/fran6co/pcl/commit/05a751aa05d842f35112148c0684a5ede16ced00.patch",
+      # fixes people compilation with libc++
+      "https://github.com/fran6co/pcl/commit/c6f532ac553072d2f22de533858b76b9871f81a8.patch",
+      # fixes GLEW linking and qhull2011
+      DATA
+    ]
   end
 
   if build.head?
@@ -34,34 +72,50 @@ class Pcl < Formula
   depends_on 'eigen'
   depends_on 'flann'
   depends_on 'cminpack'
-
+  
   if build.with? 'qt'
     depends_on 'vtk' => [:recommended,'qt']
+    depends_on 'sip'
+    depends_on 'pyqt'
   else
     depends_on 'vtk' => :recommended
   end
 
-  depends_on 'qhull'
+  # PCL doesn't support qhull 2012 yet
+  depends_on 'qhull2011'
   depends_on 'libusb'
   depends_on 'glew'
   depends_on 'totakke/openni/openni' if build.with? 'openni'
 
   def install
+    qhull2011_base = Formula.factory('qhull2011').installed_prefix
+
     args = std_cmake_args + %W[
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
+      -DQHULL_ROOT=#{qhull2011_base}
       -DCMAKE_BUILD_TYPE:STRING=Release
-      -DBUILD_SHARED_LIBS:BOOL=TRUE
-      -DBUILD_documentation:BOOL=OFF
-      -DBUILD_TESTS:BOOL=FALSE
-      -DBUILD_global_tests:BOOL=FALSE
-      -DBUILD_apps:BOOL=ON
-      -DBUILD_app_3d_rec_framework:BOOL=ON
-      -DBUILD_app_in_hand_scanner:BOOL=ON
-      -DBUILD_app_point_cloud_editor:BOOL=OFF
-      -DBUILD_app_modeler:BOOL=ON
-      -DBUILD_app_cloud_composer:BOOL=OFF
-      -DBUILD_simulation:BOOL=OFF
+      -DBUILD_SHARED_LIBS:BOOL=ON
+      -DBUILD_simulation:BOOL=ON
+      -DBUILD_outofcore:BOOL=ON
+      -DBUILD_people:BOOL=ON
     ]
+
+    if build.with? 'apps'
+      args = args + %W[
+        -DBUILD_apps:BOOL=ON
+        -DBUILD_app_3d_rec_framework:BOOL=ON
+        -DBUILD_app_cloud_composer:BOOL=OFF
+      ]
+
+      if build.with? 'qt'
+        args << "-DBUILD_app_modeler:BOOL=ON"
+        args << "-DBUILD_app_in_hand_scanner:BOOL=ON"
+        args << "-DBUILD_app_point_cloud_editor:BOOL=ON"
+      end
+      
+    else
+      args << "-DBUILD_apps:BOOL=OFF"
+    end
 
     if !build.head?
       boost149_base = Formula.factory('boost149').installed_prefix
@@ -77,6 +131,12 @@ class Pcl < Formula
       args << "-DBUILD_examples:BOOL=ON"
     else
       args << "-DBUILD_examples:BOOL=OFF"
+    end
+
+    if build.with? 'tests'
+      args << "-DBUILD_global_tests:BOOL=ON"
+    else
+      args << "-DBUILD_global_tests:BOOL=OFF"
     end
 
     if build.with? 'openni'
@@ -102,123 +162,35 @@ class Pcl < Formula
   end
 end
 __END__
-diff --git a/simulation/include/pcl/simulation/model.h b/simulation/include/pcl/simulation/model.h
-index ef599cd..d262a2f 100644
---- a/simulation/include/pcl/simulation/model.h
-+++ b/simulation/include/pcl/simulation/model.h
-@@ -6,8 +6,8 @@
- # include <windows.h>
- #endif
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
+diff --git a/cmake/Modules/FindQhull.cmake b/cmake/Modules/FindQhull.cmake
+index f5fd269..2d16436 100644
+--- a/cmake/Modules/FindQhull.cmake
++++ b/cmake/Modules/FindQhull.cmake
+@@ -47,12 +47,14 @@ find_library(QHULL_LIBRARY
+              NAMES ${QHULL_RELEASE_NAME}
+              HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
+              PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
++             NO_DEFAULT_PATH
+              PATH_SUFFIXES project build bin lib)
  
- #include <boost/shared_ptr.hpp>
- #include <pcl/pcl_macros.h>
-diff --git a/simulation/include/pcl/simulation/range_likelihood.h b/simulation/include/pcl/simulation/range_likelihood.h
-index 238b3f9..5c41ec7 100644
---- a/simulation/include/pcl/simulation/range_likelihood.h
-+++ b/simulation/include/pcl/simulation/range_likelihood.h
-@@ -2,8 +2,8 @@
- #define PCL_RANGE_LIKELIHOOD
+ find_library(QHULL_LIBRARY_DEBUG 
+              NAMES ${QHULL_DEBUG_NAME} ${QHULL_RELEASE_NAME}
+              HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
+              PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
++             NO_DEFAULT_PATH
+              PATH_SUFFIXES project build bin lib)
  
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
- 
- #include <boost/random/linear_congruential.hpp>
- #include <boost/random/normal_distribution.hpp>
-diff --git a/simulation/include/pcl/simulation/sum_reduce.h b/simulation/include/pcl/simulation/sum_reduce.h
-index e81a8ff..531f064 100644
---- a/simulation/include/pcl/simulation/sum_reduce.h
-+++ b/simulation/include/pcl/simulation/sum_reduce.h
-@@ -9,7 +9,7 @@
- #define PCL_SIMULATION_SUM_REDUCE
- 
- #include <GL/glew.h>
--#include <GL/gl.h>
-+#include <OpenGL/gl.h>
- #include <pcl/simulation/glsl_shader.h>
- #include <pcl/simulation/model.h>
- 
-diff --git a/simulation/src/range_likelihood.cpp b/simulation/src/range_likelihood.cpp
-index ee7a0fb..b981970 100644
---- a/simulation/src/range_likelihood.cpp
-+++ b/simulation/src/range_likelihood.cpp
-@@ -1,6 +1,6 @@
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
- 
- #include <pcl/common/time.h>
- #include <pcl/simulation/range_likelihood.h>
-diff --git a/simulation/tools/sim_test_performance.cpp b/simulation/tools/sim_test_performance.cpp
-index e9dab3f..7d425ba 100644
---- a/simulation/tools/sim_test_performance.cpp
-+++ b/simulation/tools/sim_test_performance.cpp
-@@ -14,9 +14,9 @@
- # include <windows.h>
- #endif
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
--#include <GL/glut.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
-+#include <GLUT/glut.h>
- #include <pcl/io/pcd_io.h>
- #include <pcl/point_types.h>
- 
-diff --git a/simulation/tools/sim_test_simple.cpp b/simulation/tools/sim_test_simple.cpp
-index a8e731a..1c3be8e 100644
---- a/simulation/tools/sim_test_simple.cpp
-+++ b/simulation/tools/sim_test_simple.cpp
-@@ -25,9 +25,9 @@
- # include <windows.h>
- #endif
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
--#include <GL/glut.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
-+#include <GLUT/glut.h>
- #include <pcl/io/pcd_io.h>
- #include <pcl/point_types.h>
- 
-diff --git a/simulation/tools/sim_viewer.cpp b/simulation/tools/sim_viewer.cpp
-index da4e625..fbdd3a5 100644
---- a/simulation/tools/sim_viewer.cpp
-+++ b/simulation/tools/sim_viewer.cpp
-@@ -46,7 +46,7 @@
- # include <windows.h>
- #endif
- #include <GL/glew.h>
--#include <GL/gl.h>
-+#include <OpenGL/gl.h>
- 
- #include <pcl/io/pcd_io.h>
- #include <pcl/point_types.h>
-diff --git a/simulation/tools/simulation_io.hpp b/simulation/tools/simulation_io.hpp
-index 634c89b..93797b1 100644
---- a/simulation/tools/simulation_io.hpp
-+++ b/simulation/tools/simulation_io.hpp
-@@ -4,9 +4,9 @@
- #include <boost/shared_ptr.hpp>
- 
- #include <GL/glew.h>
--#include <GL/gl.h>
--#include <GL/glu.h>
--#include <GL/glut.h>
-+#include <OpenGL/gl.h>
-+#include <OpenGL/glu.h>
-+#include <GLUT/glut.h>
- 
- // define the following in order to eliminate the deprecated headers warning
- #define VTK_EXCLUDE_STRSTREAM_HEADERS
+ if(NOT QHULL_LIBRARY_DEBUG) 
+diff --git a/cmake/Modules/FindGLEW.cmake b/cmake/Modules/FindGLEW.cmake
+index c45585c..42e6c39 100644
+--- a/cmake/Modules/FindGLEW.cmake
++++ b/cmake/Modules/FindGLEW.cmake
+@@ -46,7 +46,7 @@ ELSE (WIN32)
+       /System/Library/Frameworks/GLEW.framework/Versions/A/Headers
+       ${OPENGL_LIBRARY_DIR}
+     )
+-    SET(GLEW_GLEW_LIBRARY "-framework GLEW" CACHE STRING "GLEW library for OSX")
++    FIND_LIBRARY( GLEW_GLEW_LIBRARY GLEW)
+     SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
+   ELSE (APPLE)
+
