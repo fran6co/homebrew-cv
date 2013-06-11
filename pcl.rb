@@ -19,15 +19,18 @@ class Pcl < Formula
   depends_on 'pkg-config' => :build
 
   def patches
-    # wrong opengl headers
-    fix_glut_headers = [
+    fixes = []
+
+    if build.head?
+      # wrong opengl headers
+      fix_glut_headers = [
 	"gpu/kinfu/tools/kinfu_app_sim.cpp",
 	"gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
 	"simulation/tools/sim_test_performance.cpp",
 	"simulation/tools/sim_test_simple.cpp",
 	"simulation/tools/simulation_io.hpp",
-    ]
-    fix_glu_headers = fix_glut_headers + [
+      ]
+      fix_glu_headers = fix_glut_headers + [
 	"apps/in_hand_scanner/src/opengl_viewer.cpp",
 	"apps/point_cloud_editor/src/cloud.cpp",
 	"apps/point_cloud_editor/src/cloudEditorWidget.cpp",
@@ -35,22 +38,25 @@ class Pcl < Formula
 	"simulation/include/pcl/simulation/range_likelihood.h",
 	"simulation/src/range_likelihood.cpp",
 	"surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
-    ]
-    fix_gl_headers = fix_glu_headers + [
+      ]
+      fix_gl_headers = fix_glu_headers + [
 	"apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
 	"apps/point_cloud_editor/src/select1DTool.cpp",
 	"simulation/include/pcl/simulation/sum_reduce.h",
 	"simulation/tools/sim_viewer.cpp",
-    ]
-    inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
-    inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
-    inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+      ]
+      inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
+      inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
+      inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
 
-    [
-      # fixes simulation compilation https://github.com/PointCloudLibrary/pcl/pull/127
-      "https://github.com/fran6co/pcl/commit/05a751aa05d842f35112148c0684a5ede16ced00.patch",
-      # fixes people compilation with libc++
-      "https://github.com/fran6co/pcl/commit/c6f532ac553072d2f22de533858b76b9871f81a8.patch",
+      fixes = [
+        # fixes simulation compilation https://github.com/PointCloudLibrary/pcl/pull/127
+        "https://github.com/fran6co/pcl/commit/05a751aa05d842f35112148c0684a5ede16ced00.patch",
+        # fixes people compilation with libc++
+        "https://github.com/fran6co/pcl/commit/c6f532ac553072d2f22de533858b76b9871f81a8.patch",
+      ]
+    end
+    fixes + [
       # fixes GLEW linking and qhull2011
       DATA
     ]
