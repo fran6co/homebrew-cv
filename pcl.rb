@@ -9,7 +9,9 @@ class Pcl < Formula
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
   option 'with-examples', 'Build pcl examples.'
-  option 'with-tests', 'Build pcl testes.'
+  if build.head?
+    option 'with-tests', 'Build pcl testes.'
+  end
   option 'with-qt', 'Enable support for Qt4 backend.'
   option 'with-openni', 'Enable support for OpenNI.'
   option 'without-tools', 'Build without tools.'
