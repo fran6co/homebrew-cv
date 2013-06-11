@@ -47,9 +47,6 @@ class Pcl < Formula
     inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
 
     [
-      "https://github.com/fran6co/pcl/commit/0372ee18577a01f12b8c9b48e35666e1d77da1bf.patch",
-      "https://github.com/fran6co/pcl/commit/52f878ed83a04ecf28de78b207268fd1850b9266.patch",
-      "https://github.com/fran6co/pcl/commit/00443e118ba347e335324b9b4966abc7891afbc0.patch",
       # fixes simulation compilation https://github.com/PointCloudLibrary/pcl/pull/127
       "https://github.com/fran6co/pcl/commit/05a751aa05d842f35112148c0684a5ede16ced00.patch",
       # fixes people compilation with libc++
