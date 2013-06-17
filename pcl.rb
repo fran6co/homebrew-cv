@@ -50,18 +50,10 @@ class Pcl < Formula
       inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
       inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
       inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
-
-      fixes = [
-        # fixes simulation compilation https://github.com/PointCloudLibrary/pcl/pull/127
-        "https://github.com/fran6co/pcl/commit/05a751aa05d842f35112148c0684a5ede16ced00.patch",
-        # fixes people compilation with libc++
-        "https://github.com/fran6co/pcl/commit/c6f532ac553072d2f22de533858b76b9871f81a8.patch",
-      ]
     end
-    fixes + [
-      # fixes GLEW linking and qhull2011
-      DATA
-    ]
+x
+    # fixes GLEW linking and qhull2011
+    DATA
   end
 
   if build.head?
