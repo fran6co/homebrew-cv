@@ -51,7 +51,6 @@ class Pcl < Formula
       inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
       inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     end
-x
     # fixes GLEW linking and qhull2011
     DATA
   end
