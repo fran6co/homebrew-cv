@@ -105,7 +105,7 @@ class Pcl < Formula
 
       if build.with? 'qt'
         args << "-DBUILD_app_modeler:BOOL=ON"
-        args << "-DBUILD_app_in_hand_scanner:BOOL=ON"
+        args << "-DBUILD_app_in_hand_scanner:BOOL=ON" if build.with? 'openni'
         args << "-DBUILD_app_point_cloud_editor:BOOL=ON"
       end
       
