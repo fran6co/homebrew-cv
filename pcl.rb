@@ -154,6 +154,9 @@ class Pcl < Formula
       system 'cmake', *args
       system "make"
       system "make install"
+      if build.with? 'test'
+        system 'make test'
+      end
     end
   end
 end
