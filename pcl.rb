@@ -10,7 +10,7 @@ class Pcl < Formula
 
   option 'with-examples', 'Build pcl examples.'
   if build.head?
-    option 'with-tests', 'Build pcl testes.'
+    option 'with-tests', 'Build pcl tests.'
   end
   option 'with-qt', 'Enable support for Qt4 backend.'
   option 'with-openni', 'Enable support for OpenNI.'
