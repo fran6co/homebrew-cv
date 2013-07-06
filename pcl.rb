@@ -50,9 +50,13 @@ class Pcl < Formula
       inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
       inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
       inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+
+      fixes = [
+         "https://github.com/wjwwood/pcl/commit/1ebdbe88d74db163803caac67e45e782a11cee43.patch"
+      ]
     end
     # fixes GLEW linking and qhull2011
-    DATA
+    [DATA] + fixes
   end
 
   if build.head?
