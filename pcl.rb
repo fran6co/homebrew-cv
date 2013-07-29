@@ -3,15 +3,14 @@ require 'formula'
 
 class Pcl < Formula
   homepage 'http://www.pointclouds.org/'
-  url 'http://downloads.sourceforge.net/project/pointclouds/1.6.0/PCL-1.6.0-Source.tar.bz2'
-  sha1 '45a2e155d7faf5901abe609fd40d5f1659015e9e'
+  url 'https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.0.zip'
+  sha1 '15bf2e82a3fc173b475cf3a0bf1cc4438995e0cb'
+  version "1.7.0"
 
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
   option 'with-examples', 'Build pcl examples.'
-  if build.head?
-    option 'with-tests', 'Build pcl tests.'
-  end
+  option 'with-tests', 'Build pcl tests.'
   option 'with-qt', 'Enable support for Qt4 backend.'
   option 'with-openni', 'Enable support for OpenNI.'
   option 'without-tools', 'Build without tools.'
@@ -22,49 +21,48 @@ class Pcl < Formula
 
   def patches
     fixes = []
-
+    # wrong opengl headers
+    fix_glut_headers = []
     if build.head?
-      # wrong opengl headers
-      fix_glut_headers = [
-	"gpu/kinfu/tools/kinfu_app_sim.cpp",
-	"gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
-	"simulation/tools/sim_test_performance.cpp",
-	"simulation/tools/sim_test_simple.cpp",
-	"simulation/tools/simulation_io.hpp",
-      ]
-      fix_glu_headers = fix_glut_headers + [
+	fix_glut_headers = [
+		"gpu/kinfu/tools/kinfu_app_sim.cpp",
+		"gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
+		"simulation/tools/sim_test_performance.cpp",
+		"simulation/tools/sim_test_simple.cpp",
+		"simulation/tools/simulation_io.hpp",
+    	]
+    end
+    fix_glu_headers = fix_glut_headers + [
 	"apps/in_hand_scanner/src/opengl_viewer.cpp",
 	"apps/point_cloud_editor/src/cloud.cpp",
 	"apps/point_cloud_editor/src/cloudEditorWidget.cpp",
-	"simulation/include/pcl/simulation/model.h",
-	"simulation/include/pcl/simulation/range_likelihood.h",
-	"simulation/src/range_likelihood.cpp",
 	"surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
-      ]
-      fix_gl_headers = fix_glu_headers + [
+    ]
+    if build.head?
+	fix_glu_headers += [
+		"simulation/include/pcl/simulation/model.h",
+		"simulation/include/pcl/simulation/range_likelihood.h",
+		"simulation/src/range_likelihood.cpp",
+	]
+    end
+    fix_gl_headers = fix_glu_headers + [
 	"apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
 	"apps/point_cloud_editor/src/select1DTool.cpp",
-	"simulation/include/pcl/simulation/sum_reduce.h",
-	"simulation/tools/sim_viewer.cpp",
-      ]
-      inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
-      inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
-      inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+    ]
+    if build.head?
+        fix_gl_headers += [
+		"simulation/tools/sim_viewer.cpp",
+		"simulation/include/pcl/simulation/sum_reduce.h",
+	]
+	inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
     end
+    inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
+    inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     # fixes GLEW linking and qhull2011
     [DATA] + fixes
   end
 
-  if build.head?
-    depends_on 'boost'
-  else
-    depends_on 'boost149'
-
-    fails_with :clang do
-      cause "Compilation fails with clang on 1.6.0"
-    end
-  end
-
+  depends_on 'boost'
   depends_on 'eigen'
   depends_on 'flann'
   depends_on 'cminpack'
@@ -111,12 +109,6 @@ class Pcl < Formula
       
     else
       args << "-DBUILD_apps:BOOL=OFF"
-    end
-
-    if !build.head?
-      boost149_base = Formula.factory('boost149').installed_prefix
-      boost149_include = File.join(boost149_base, 'include')
-      args <<  "-DBoost_INCLUDE_DIR=#{boost149_include}"
     end
 
     if build.without? 'tools'
