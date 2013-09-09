@@ -68,7 +68,7 @@ class Pcl < Formula
   depends_on 'cminpack'
   
   if build.with? 'qt'
-    depends_on 'vtk' => [:recommended,'qt']
+    depends_on 'vtk' => [:recommended,'with-qt']
     depends_on 'sip'
     depends_on 'pyqt'
   else
