@@ -20,44 +20,51 @@ class Pcl < Formula
   depends_on 'pkg-config' => :build
 
   def patches
-    fixes = []
     # wrong opengl headers
-    fix_glut_headers = []
     if build.head?
-	fix_glut_headers = [
-		"gpu/kinfu/tools/kinfu_app_sim.cpp",
-		"gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
-		"simulation/tools/sim_test_performance.cpp",
-		"simulation/tools/sim_test_simple.cpp",
-		"simulation/tools/simulation_io.hpp",
+    	fix_glut_headers = [
+            "gpu/kinfu/tools/kinfu_app_sim.cpp",
+            "gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
+            "simulation/tools/sim_test_performance.cpp",
+            "simulation/tools/sim_test_simple.cpp",
+            "simulation/tools/simulation_io.hpp",
     	]
+    	
+    	fix_glu_headers = fix_glut_headers + [
+	        "apps/in_hand_scanner/src/opengl_viewer.cpp",
+	        "surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
+	         
+	        "simulation/include/pcl/simulation/model.h",
+	        "simulation/include/pcl/simulation/range_likelihood.h",
+	        "simulation/src/range_likelihood.cpp",
+        ]
+        
+        fix_gl_headers = fix_glu_headers + [
+            "simulation/tools/sim_viewer.cpp",
+            "simulation/include/pcl/simulation/sum_reduce.h",
+        ]
+        
+        inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
+        inreplace fix_glu_headers + ["apps/point_cloud_editor/src/cloudEditorWidget.cpp"], '<GL/glu.h>', '<OpenGL/glu.h>'
+        inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+    else
+    	fix_glu_headers =  [
+	        "apps/in_hand_scanner/src/opengl_viewer.cpp",
+	        "apps/point_cloud_editor/src/cloud.cpp",
+	        "apps/point_cloud_editor/src/cloudEditorWidget.cpp",
+	        "surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
+        ]
+        
+        fix_gl_headers = fix_glu_headers + [
+	        "apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
+	        "apps/point_cloud_editor/src/select1DTool.cpp",
+        ]
+        
+        inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
+        inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     end
-    fix_glu_headers = fix_glut_headers + [
-	"apps/in_hand_scanner/src/opengl_viewer.cpp",
-	"apps/point_cloud_editor/src/cloud.cpp",
-	"apps/point_cloud_editor/src/cloudEditorWidget.cpp",
-	"surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
-    ]
-    if build.head?
-	fix_glu_headers += [
-		"simulation/include/pcl/simulation/model.h",
-		"simulation/include/pcl/simulation/range_likelihood.h",
-		"simulation/src/range_likelihood.cpp",
-	]
-    end
-    fix_gl_headers = fix_glu_headers + [
-	"apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
-	"apps/point_cloud_editor/src/select1DTool.cpp",
-    ]
-    if build.head?
-        fix_gl_headers += [
-		"simulation/tools/sim_viewer.cpp",
-		"simulation/include/pcl/simulation/sum_reduce.h",
-	]
-	inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
-    end
-    inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
-    inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
+    fixes = []
+    
     # fixes GLEW linking and qhull2011
     [DATA] + fixes
   end
