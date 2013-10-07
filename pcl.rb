@@ -148,6 +148,8 @@ class Pcl < Formula
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_VTK:BOOL=TRUE"
     end
 
+    args << "-DCMAKE_CXX_FLAGS=-ftemplate-depth=1024"
+
     args << '..'
     mkdir 'macbuild' do
       system 'cmake', *args
