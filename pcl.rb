@@ -3,9 +3,9 @@ require 'formula'
 
 class Pcl < Formula
   homepage 'http://www.pointclouds.org/'
-  url 'https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.0.zip'
-  sha1 '15bf2e82a3fc173b475cf3a0bf1cc4438995e0cb'
-  version "1.7.0"
+  url 'https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.1.zip'
+  sha1 '9a21d36980e9b67ef6d43fbb3dfdc4b4291acec2'
+  version "1.7.1"
 
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
