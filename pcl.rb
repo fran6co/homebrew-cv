@@ -63,7 +63,9 @@ class Pcl < Formula
         inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
         inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     end
-    fixes = []
+    fixes = [
+        "https://github.com/fran6co/pcl/compare/fix-10.9.patch",
+    ]
     
     # fixes GLEW linking and qhull2011
     [DATA] + fixes
@@ -147,8 +149,6 @@ class Pcl < Formula
     if build.without? 'vtk'
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_VTK:BOOL=TRUE"
     end
-
-    args << "-DCMAKE_CXX_FLAGS=-ftemplate-depth=1024"
 
     args << '..'
     mkdir 'macbuild' do
