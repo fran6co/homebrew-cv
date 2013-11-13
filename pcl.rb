@@ -69,6 +69,8 @@ class Pcl < Formula
   depends_on 'totakke/openni/openni' if build.with? 'openni'
 
   def install
+    raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
+
     qhull2011_base = Formula.factory('qhull2011').installed_prefix
 
     args = std_cmake_args + %W[
