@@ -21,33 +21,7 @@ class Pcl < Formula
 
   def patches
     # wrong opengl headers
-    if build.head?
-    	fix_glut_headers = [
-            "gpu/kinfu/tools/kinfu_app_sim.cpp",
-            "gpu/kinfu_large_scale/tools/kinfu_app_sim.cpp",
-            "simulation/tools/sim_test_performance.cpp",
-            "simulation/tools/sim_test_simple.cpp",
-            "simulation/tools/simulation_io.hpp",
-    	]
-    	
-    	fix_glu_headers = fix_glut_headers + [
-	        "apps/in_hand_scanner/src/opengl_viewer.cpp",
-	        "surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
-	         
-	        "simulation/include/pcl/simulation/model.h",
-	        "simulation/include/pcl/simulation/range_likelihood.h",
-	        "simulation/src/range_likelihood.cpp",
-        ]
-        
-        fix_gl_headers = fix_glu_headers + [
-            "simulation/tools/sim_viewer.cpp",
-            "simulation/include/pcl/simulation/sum_reduce.h",
-        ]
-        
-        inreplace fix_glut_headers, '<GL/glut.h>', '<GLUT/glut.h>'
-        inreplace fix_glu_headers + ["apps/point_cloud_editor/src/cloudEditorWidget.cpp"], '<GL/glu.h>', '<OpenGL/glu.h>'
-        inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
-    else
+    if !build.head?
     	fix_glu_headers =  [
 	        "apps/in_hand_scanner/src/opengl_viewer.cpp",
 	        "apps/point_cloud_editor/src/cloud.cpp",
@@ -67,6 +41,7 @@ class Pcl < Formula
     if build.head?
         fixes = [
            "https://github.com/fran6co/pcl/compare/fix-10.9.patch",
+           "https://github.com/PointCloudLibrary/pcl/pull/357.patch",
         ]
     end
     
@@ -99,7 +74,6 @@ class Pcl < Formula
     args = std_cmake_args + %W[
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DQHULL_ROOT=#{qhull2011_base}
-      -DCMAKE_BUILD_TYPE:STRING=Release
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_simulation:BOOL=ON
       -DBUILD_outofcore:BOOL=ON
