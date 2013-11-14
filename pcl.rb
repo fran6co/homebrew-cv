@@ -40,8 +40,7 @@ class Pcl < Formula
     fixes = []
     if build.head?
         fixes = [
-           "https://github.com/fran6co/pcl/compare/fix-10.9.patch",
-           "https://github.com/PointCloudLibrary/pcl/pull/357.patch",
+           "https://github.com/fran6co/pcl/compare/vtk6-fixes.patch"
         ]
     end
     
