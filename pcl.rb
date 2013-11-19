@@ -41,6 +41,7 @@ class Pcl < Formula
     if build.head?
         fixes = [
            "https://github.com/fran6co/pcl/compare/vtk6-fixes.patch",
+           "https://github.com/PointCloudLibrary/pcl/pull/376.patch",
         ]
     end
     
@@ -76,24 +77,21 @@ class Pcl < Formula
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DQHULL_ROOT=#{qhull2011_base}
       -DBUILD_SHARED_LIBS:BOOL=ON
-      -DBUILD_simulation:BOOL=ON
-      -DBUILD_outofcore:BOOL=ON
-      -DBUILD_people:BOOL=ON
+      -DBUILD_simulation:BOOL=AUTO_OFF
+      -DBUILD_outofcore:BOOL=AUTO_OFF
+      -DBUILD_people:BOOL=AUTO_OFF
     ]
 
     if build.with? 'apps'
       args = args + %W[
-        -DBUILD_apps:BOOL=ON
-        -DBUILD_app_3d_rec_framework:BOOL=ON
-        -DBUILD_app_cloud_composer:BOOL=OFF
+        -DBUILD_apps=AUTO_OFF
+        -DBUILD_apps_3d_rec_framework=AUTO_OFF
+        -DBUILD_apps_cloud_composer:BOOL=OFF
+        -DBUILD_apps_in_hand_scanner=AUTO_OFF
+        -DBUILD_apps_modeler=AUTO_OFF
+        -DBUILD_apps_optronic_viewer=AUTO_OFF
+        -DBUILD_apps_point_cloud_editor=AUTO_OFF
       ]
-
-      if build.with? 'qt'
-        args << "-DBUILD_app_modeler:BOOL=ON"
-        args << "-DBUILD_app_in_hand_scanner:BOOL=ON" if build.with? 'openni'
-        args << "-DBUILD_app_point_cloud_editor:BOOL=ON"
-      end
-      
     else
       args << "-DBUILD_apps:BOOL=OFF"
     end
