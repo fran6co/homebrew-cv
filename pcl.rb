@@ -11,13 +11,29 @@ class Pcl < Formula
 
   option 'with-examples', 'Build pcl examples.'
   option 'with-tests', 'Build pcl tests.'
-  option 'with-qt', 'Enable support for Qt4 backend.'
-  option 'with-openni', 'Enable support for OpenNI.'
   option 'without-tools', 'Build without tools.'
   option 'without-apps', 'Build without apps.'
+  option 'without-qvtk', 'Build without qvtk support.'
 
   depends_on 'cmake' => :build
   depends_on 'pkg-config' => :build
+
+  depends_on 'boost'
+  depends_on 'eigen'
+  depends_on 'flann'
+  depends_on 'cminpack'
+
+  # PCL doesn't support qhull 2012 yet
+  depends_on 'qhull2011'
+  depends_on 'libusb'
+  depends_on 'glew'
+  depends_on 'qt' => :recommended
+  if build.with? 'qvtk'
+    depends_on 'vtk' => [:recommended,'with-qt']
+  else
+    depends_on 'vtk' => :recommended
+  end
+  depends_on 'totakke/openni/openni' => :optional
 
   def patches
     # wrong opengl headers
@@ -48,25 +64,6 @@ class Pcl < Formula
     # fixes GLEW linking and qhull2011
     [DATA] + fixes
   end
-
-  depends_on 'boost'
-  depends_on 'eigen'
-  depends_on 'flann'
-  depends_on 'cminpack'
-  
-  if build.with? 'qt'
-    depends_on 'vtk' => [:recommended,'with-qt']
-    depends_on 'sip'
-    depends_on 'pyqt'
-  else
-    depends_on 'vtk' => :recommended
-  end
-
-  # PCL doesn't support qhull 2012 yet
-  depends_on 'qhull2011'
-  depends_on 'libusb'
-  depends_on 'glew'
-  depends_on 'totakke/openni/openni' if build.with? 'openni'
 
   def install
     raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
