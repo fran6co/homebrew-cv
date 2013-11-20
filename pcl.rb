@@ -29,9 +29,9 @@ class Pcl < Formula
   depends_on 'glew'
   depends_on 'qt' => :recommended
   if build.with? 'qvtk'
-    depends_on 'vtk' => [:recommended,'with-qt']
+    depends_on 'homebrew/versions/vtk5' => [:recommended,'with-qt']
   else
-    depends_on 'vtk' => :recommended
+    depends_on 'homebrew/versions/vtk5' => :recommended
   end
   depends_on 'totakke/openni/openni' => :optional
 
@@ -56,7 +56,6 @@ class Pcl < Formula
     fixes = []
     if build.head?
         fixes = [
-           "https://github.com/fran6co/pcl/compare/vtk6-fixes.patch",
            "https://github.com/PointCloudLibrary/pcl/pull/377.patch",
         ]
     end
