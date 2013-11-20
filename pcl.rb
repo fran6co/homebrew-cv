@@ -118,7 +118,7 @@ class Pcl < Formula
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_Qt4:BOOL=TRUE"
     end
 
-    if build.without? 'vtk'
+    if build.without? 'vtk5'
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_VTK:BOOL=TRUE"
     end
 
