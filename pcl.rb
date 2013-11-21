@@ -38,16 +38,13 @@ class Pcl < Formula
   def patches
     # wrong opengl headers
     if !build.head?
-    	fix_glu_headers =  [
+    	fix_gl_headers =  [
 	        "apps/in_hand_scanner/src/opengl_viewer.cpp",
-	        "apps/point_cloud_editor/src/cloud.cpp",
-	        "apps/point_cloud_editor/src/cloudEditorWidget.cpp",
 	        "surface/include/pcl/surface/3rdparty/opennurbs/opennurbs_gl.h",
         ]
-        
-        fix_gl_headers = fix_glu_headers + [
-	        "apps/point_cloud_editor/include/pcl/apps/point_cloud_editor/select2DTool.h",
-	        "apps/point_cloud_editor/src/select1DTool.cpp",
+
+    	fix_glu_headers =  fix_gl_headers + [
+	        "apps/point_cloud_editor/src/cloudEditorWidget.cpp",
         ]
         
         inreplace fix_glu_headers, '<GL/glu.h>', '<OpenGL/glu.h>'
