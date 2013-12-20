@@ -33,7 +33,7 @@ class Pcl < Formula
   else
     depends_on 'homebrew/versions/vtk5' => :recommended
   end
-  depends_on 'totakke/openni/openni' => :optional
+  depends_on 'homebrew/science/openni' => :optional
 
   def patches
     # wrong opengl headers
