@@ -73,6 +73,7 @@ class Pcl < Formula
       -DBUILD_simulation:BOOL=AUTO_OFF
       -DBUILD_outofcore:BOOL=AUTO_OFF
       -DBUILD_people:BOOL=AUTO_OFF
+      -DWITH_CUDA:BOOL=OFF
     ]
 
     if build.with? 'apps'
