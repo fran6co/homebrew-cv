@@ -52,9 +52,7 @@ class Pcl < Formula
     end
     fixes = []
     if build.head?
-        fixes = [
-           "https://github.com/PointCloudLibrary/pcl/pull/486.patch",
-        ]
+        fixes = []
     end
     
     # fixes GLEW linking and qhull2011
