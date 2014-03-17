@@ -149,16 +149,4 @@ index f5fd269..2d16436 100644
               PATH_SUFFIXES project build bin lib)
  
  if(NOT QHULL_LIBRARY_DEBUG) 
-diff --git a/cmake/Modules/FindGLEW.cmake b/cmake/Modules/FindGLEW.cmake
-index c45585c..42e6c39 100644
---- a/cmake/Modules/FindGLEW.cmake
-+++ b/cmake/Modules/FindGLEW.cmake
-@@ -46,7 +46,7 @@ ELSE (WIN32)
-       /System/Library/Frameworks/GLEW.framework/Versions/A/Headers
-       ${OPENGL_LIBRARY_DIR}
-     )
--    SET(GLEW_GLEW_LIBRARY "-framework GLEW" CACHE STRING "GLEW library for OSX")
-+    FIND_LIBRARY( GLEW_GLEW_LIBRARY GLEW)
-     SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
-   ELSE (APPLE)
 
