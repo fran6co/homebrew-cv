@@ -14,9 +14,14 @@ class Pcl < Formula
   option 'without-tools', 'Build without tools.'
   option 'without-apps', 'Build without apps.'
   option 'without-qvtk', 'Build without qvtk support.'
+  option 'with-docs', 'Build with docs.'
 
   depends_on 'cmake' => :build
   depends_on 'pkg-config' => :build
+
+  if build.with? 'docs'
+    depends_on 'doxygen' => :build
+  end
 
   depends_on 'boost'
   depends_on 'eigen'
@@ -34,6 +39,11 @@ class Pcl < Formula
     depends_on 'homebrew/versions/vtk5' => :recommended
   end
   depends_on 'homebrew/science/openni' => :optional
+
+  resource 'sphinx' do
+    url 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.2.2.tar.gz'
+    sha1 '9e424b03fe1f68e0326f3905738adcf27782f677'
+  end
 
   def patches
     # wrong opengl headers
@@ -73,6 +83,24 @@ class Pcl < Formula
       -DBUILD_people:BOOL=AUTO_OFF
       -DWITH_CUDA:BOOL=OFF
     ]
+
+    if build.with? "docs"
+      (buildpath/"sphinx").mkpath
+
+      resource("sphinx").stage do
+        system "python", "setup.py", "install",
+                                     "--prefix=#{buildpath}/sphinx",
+                                     "--record=installed.txt",
+                                     "--single-version-externally-managed"
+      end
+
+      args << "-DPC_SPHINX_EXECUTABLE="+(buildpath/"sphinx/bin")
+      args << "-DWITH_DOCS:BOOL=ON"
+      args << "-DWITH_TUTORIALS:BOOL=ON"
+    else
+      args << "-DWITH_TUTORIALS:BOOL=OFF"
+      args << "-DWITH_DOCS:BOOL=OFF"
+    end
 
     if build.with? 'apps'
       args = args + %W[
