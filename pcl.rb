@@ -1,5 +1,34 @@
 require 'formula'
 
+class CudaRequirement < Requirement
+  build true
+  fatal true
+
+  satisfy { which 'nvcc' }
+
+  env do
+    # Nvidia CUDA installs (externally) into this dir (hard-coded):
+    ENV.append 'CFLAGS', "-F/Library/Frameworks"
+    # # because nvcc has to be used
+    ENV.append 'PATH', which('nvcc').dirname, ':'
+  end
+
+  def message
+    <<-EOS.undent
+      To use this formula with NVIDIA graphics cards you will need to
+      download and install the CUDA drivers and tools from nvidia.com.
+
+          https://developer.nvidia.com/cuda-downloads
+
+      Select "Mac OS" as the Operating System and then select the
+      'Developer Drivers for MacOS' package.
+      You will also need to download and install the 'CUDA Toolkit' package.
+
+      The `nvcc` has to be in your PATH then (which is normally the case).
+
+  EOS
+  end
+end
 
 class Pcl < Formula
   homepage 'http://www.pointclouds.org/'
@@ -27,6 +56,8 @@ class Pcl < Formula
   depends_on 'eigen'
   depends_on 'flann'
   depends_on 'cminpack'
+
+  depends_on CudaRequirement => :optional
 
   # PCL doesn't support qhull 2012 yet
   depends_on 'qhull2011'
@@ -81,8 +112,13 @@ class Pcl < Formula
       -DBUILD_simulation:BOOL=AUTO_OFF
       -DBUILD_outofcore:BOOL=AUTO_OFF
       -DBUILD_people:BOOL=AUTO_OFF
-      -DWITH_CUDA:BOOL=OFF
     ]
+
+    if build.with? "cuda"
+      args << "-DWITH_CUDA:BOOL=AUTO_OFF"
+    else
+      args << "-DWITH_CUDA:BOOL=OFF"
+    end
 
     if build.with? "docs"
       (buildpath/"sphinx").mkpath
@@ -202,3 +238,35 @@ index f6c6e2a..bcdb430 100644
      SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
    ELSE (APPLE)
  
+diff --git a/cmake/pcl_find_cuda.cmake b/cmake/pcl_find_cuda.cmake
+index 2f0425e..0675a55 100644
+--- a/cmake/pcl_find_cuda.cmake
++++ b/cmake/pcl_find_cuda.cmake
+@@ -1,16 +1,6 @@
+ # Find CUDA
+ 
+ 
+-# Recent versions of cmake set CUDA_HOST_COMPILER to CMAKE_C_COMPILER which
+-# on OSX defaults to clang (/usr/bin/cc), but this is not a supported cuda
+-# compiler.  So, here we will preemptively set CUDA_HOST_COMPILER to gcc if
+-# that compiler exists in /usr/bin.  This will not override an existing cache
+-# value if the user has passed CUDA_HOST_COMPILER on the command line.
+-if (NOT DEFINED CUDA_HOST_COMPILER AND CMAKE_C_COMPILER_ID STREQUAL "Clang" AND EXISTS /usr/bin/gcc)
+-  set(CUDA_HOST_COMPILER /usr/bin/gcc CACHE FILEPATH "Host side compiler used by NVCC")
+-  message(STATUS "Setting CMAKE_HOST_COMPILER to /usr/bin/gcc instead of ${CMAKE_C_COMPILER}.  See http://dev.pointclouds.org/issues/979")
+-endif()
+-
+ if(MSVC11)
+ 	# Setting this to true brakes Visual Studio builds.
+ 	set(CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE OFF CACHE BOOL "CUDA_ATTACH_VS_BUILD_RULE_TO_CUDA_FILE")
+@@ -47,10 +37,5 @@ if(CUDA_FOUND)
+ 	include(${PCL_SOURCE_DIR}/cmake/CudaComputeTargetFlags.cmake)
+ 	APPEND_TARGET_ARCH_FLAGS()
+     
+-  # Send a warning if CUDA_HOST_COMPILER is set to a compiler that is known
+-  # to be unsupported.
+-  if (CUDA_HOST_COMPILER STREQUAL CMAKE_C_COMPILER AND CMAKE_C_COMPILER_ID STREQUAL "Clang")
+-    message(WARNING "CUDA_HOST_COMPILER is set to an unsupported compiler: ${CMAKE_C_COMPILER}.  See http://dev.pointclouds.org/issues/979")
+-  endif()
+ 
+ endif()
