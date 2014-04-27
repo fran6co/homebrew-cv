@@ -3,7 +3,7 @@ require 'formula'
 class CudaRequirement < Requirement
   build true
   fatal true
-
+  
   satisfy { which 'nvcc' }
 
   env do
@@ -30,12 +30,23 @@ class CudaRequirement < Requirement
   end
 end
 
+
+class MavericksHEADRequirement < Requirement
+  build true
+  fatal true
+  satisfy {false}
+  def message
+    <<-EOS.undent
+   PCL currently requires --HEAD on Mavericks or with OpenNI2 support. Please, add it.
+  EOS
+  end
+end
+
 class Pcl < Formula
   homepage 'http://www.pointclouds.org/'
   url 'https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.1.zip'
   sha1 '9a21d36980e9b67ef6d43fbb3dfdc4b4291acec2'
   version "1.7.1"
-
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
   option 'with-examples', 'Build pcl examples.'
@@ -44,6 +55,14 @@ class Pcl < Formula
   option 'without-apps', 'Build without apps.'
   option 'without-qvtk', 'Build without qvtk support.'
   option 'with-docs', 'Build with docs.'
+  option 'with-openni2', 'Build with OpenNI2 support.'
+
+  if build.with? 'openni2'
+    pcl_openni2_waegel = "https://github.com/kwaegel/pcl.git"
+    ohai "Using PCL with OpenNI2 support pull request from Ky Waegel #{pcl_openni2_waegel}"
+    depends_on 'openni2'
+    head pcl_openni2_waegel
+  end
 
   depends_on 'cmake' => :build
   depends_on 'pkg-config' => :build
@@ -58,6 +77,10 @@ class Pcl < Formula
   depends_on 'cminpack'
 
   depends_on CudaRequirement => :optional
+  
+  if ((MacOS.version == :mavericks and not build.head?) or (build.with?('openni2') and not build.head?))
+     depends_on MavericksHEADRequirement
+  end
 
   # PCL doesn't support qhull 2012 yet
   depends_on 'qhull2011'
@@ -75,8 +98,11 @@ class Pcl < Formula
     url 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.2.2.tar.gz'
     sha1 '9e424b03fe1f68e0326f3905738adcf27782f677'
   end
-
+      
   def patches
+ #   raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
+  #  raise 'PCL with OpenNI2 currently requires --HEAD' if not build.head?
+    
     # wrong opengl headers
     if !build.head?
     	fix_gl_headers =  [
@@ -100,11 +126,9 @@ class Pcl < Formula
     [DATA] + fixes
   end
 
-  def install
-    raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
-
+  def install        
     qhull2011_base = Formula.factory('qhull2011').installed_prefix
-
+        
     args = std_cmake_args + %W[
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
       -DQHULL_ROOT=#{qhull2011_base}
@@ -113,6 +137,13 @@ class Pcl < Formula
       -DBUILD_outofcore:BOOL=AUTO_OFF
       -DBUILD_people:BOOL=AUTO_OFF
     ]
+
+    if build.with? 'openni2'
+      ENV.append 'OPENNI2_INCLUDE', "#{HOMEBREW_PREFIX}/include/ni2"
+      ENV.append 'OPENNI2_REDIST', "#{HOMEBREW_PREFIX}/lib/ni2"
+      args << "-DBUILD_OPENNI2:BOOL=ON"
+    end
+    
 
     if build.with? "cuda"
       args << "-DWITH_CUDA:BOOL=AUTO_OFF"
