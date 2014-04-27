@@ -61,7 +61,7 @@ class Pcl < Formula
     pcl_openni2_waegel = "https://github.com/kwaegel/pcl.git"
     ohai "Using PCL with OpenNI2 support pull request from Ky Waegel #{pcl_openni2_waegel}"
     depends_on 'openni2'
-    head pcl_openni2_waegel
+    head pcl_openni2_waegel, :branch => "openni2_pullrequest"
   end
 
   depends_on 'cmake' => :build
