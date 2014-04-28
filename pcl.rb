@@ -70,6 +70,7 @@ class Pcl < Formula
     depends_on 'homebrew/versions/vtk5' => :recommended
   end
   depends_on 'homebrew/science/openni' => :optional
+  depends_on 'totakke/openni2/openni2' => :optional
 
   resource 'sphinx' do
     url 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.2.2.tar.gz'
@@ -92,8 +93,10 @@ class Pcl < Formula
         inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     end
     fixes = []
-    if build.head?
-        fixes = []
+    if build.head? and build.with? 'openni2'
+        fixes = [
+               "https://github.com/PointCloudLibrary/pcl/pull/276.patch",
+        ]
     end
     
     # fixes GLEW linking and qhull2011
@@ -101,6 +104,10 @@ class Pcl < Formula
   end
 
   def install
+    if not build.head? and build.with? 'openni2'
+          raise 'PCL currently requires --HEAD to build openni2 support' 
+    end
+
     raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
 
     qhull2011_base = Formula.factory('qhull2011').installed_prefix
@@ -113,6 +120,12 @@ class Pcl < Formula
       -DBUILD_outofcore:BOOL=AUTO_OFF
       -DBUILD_people:BOOL=AUTO_OFF
     ]
+
+    if build.head? and build.with? 'openni2'
+      ENV.append 'OPENNI2_INCLUDE', "#{HOMEBREW_PREFIX}/include/ni2"
+      ENV.append 'OPENNI2_REDIST', "#{HOMEBREW_PREFIX}/lib/ni2"
+      args << "-DBUILD_OPENNI2:BOOL=ON"
+    end
 
     if build.with? "cuda"
       args << "-DWITH_CUDA:BOOL=AUTO_OFF"
