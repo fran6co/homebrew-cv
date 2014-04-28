@@ -215,29 +215,31 @@ index f5fd269..2d16436 100644
  if(NOT QHULL_LIBRARY_DEBUG) 
 
 diff --git a/cmake/Modules/FindGLEW.cmake b/cmake/Modules/FindGLEW.cmake
-index f6c6e2a..bcdb430 100644
+index f6c6e2a..f59a780 100644
 --- a/cmake/Modules/FindGLEW.cmake
 +++ b/cmake/Modules/FindGLEW.cmake
-@@ -41,18 +41,11 @@ IF (WIN32)
+@@ -41,21 +41,6 @@ IF (WIN32)
  ELSE (WIN32)
  
    IF (APPLE)
 -# These values for Apple could probably do with improvement.
 -  if (${CMAKE_SYSTEM_VERSION} VERSION_LESS "13.0.0")
-     FIND_PATH( GLEW_INCLUDE_DIR glew.h
-       /System/Library/Frameworks/GLEW.framework/Versions/A/Headers
-       ${OPENGL_LIBRARY_DIR}
-       )
+-    FIND_PATH( GLEW_INCLUDE_DIR glew.h
+-      /System/Library/Frameworks/GLEW.framework/Versions/A/Headers
+-      ${OPENGL_LIBRARY_DIR}
+-      )
 -    SET(GLEW_GLEW_LIBRARY "-framework GLEW" CACHE STRING "GLEW library for OSX")
 -  else (${CMAKE_SYSTEM_VERSION} VERSION_LESS "13.0.0")
 -    find_package(PkgConfig)
 -    pkg_check_modules(glew GLEW)
 -    SET(GLEW_GLEW_LIBRARY ${GLEW_LIBRARIES} CACHE STRING "GLEW library for OSX")
 -  endif (${CMAKE_SYSTEM_VERSION} VERSION_LESS "13.0.0")
-+    FIND_LIBRARY( GLEW_GLEW_LIBRARY GLEW)
-     SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
-   ELSE (APPLE)
- 
+-    SET(GLEW_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
+-  ELSE (APPLE)
+-
+     FIND_PATH( GLEW_INCLUDE_DIR GL/glew.h
+       /usr/include/GL
+       /usr/openwin/share/include
 diff --git a/cmake/pcl_find_cuda.cmake b/cmake/pcl_find_cuda.cmake
 index 2f0425e..0675a55 100644
 --- a/cmake/pcl_find_cuda.cmake
