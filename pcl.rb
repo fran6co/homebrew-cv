@@ -93,11 +93,6 @@ class Pcl < Formula
         inreplace fix_gl_headers, '<GL/gl.h>', '<OpenGL/gl.h>'
     end
     fixes = []
-    if build.head? and build.with? 'openni2'
-        fixes = [
-               "https://github.com/PointCloudLibrary/pcl/pull/276.patch",
-        ]
-    end
     
     # fixes GLEW linking and qhull2011
     [DATA] + fixes
