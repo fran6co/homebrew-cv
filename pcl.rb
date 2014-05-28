@@ -32,9 +32,6 @@ end
 
 class Pcl < Formula
   homepage 'http://www.pointclouds.org/'
-  url 'https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.1.zip'
-  sha1 '9a21d36980e9b67ef6d43fbb3dfdc4b4291acec2'
-  version "1.7.1"
 
   head 'https://github.com/PointCloudLibrary/pcl.git'
 
@@ -65,9 +62,9 @@ class Pcl < Formula
   depends_on 'glew'
   depends_on 'qt' => :recommended
   if build.with? 'qvtk'
-    depends_on 'homebrew/versions/vtk5' => [:recommended,'with-qt']
+    depends_on 'vtk' => [:recommended,'with-qt']
   else
-    depends_on 'homebrew/versions/vtk5' => :recommended
+    depends_on 'vtk' => :recommended
   end
   depends_on 'homebrew/science/openni' => :optional
   depends_on 'totakke/openni2/openni2' => :optional
@@ -186,7 +183,7 @@ class Pcl < Formula
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_Qt4:BOOL=TRUE"
     end
 
-    if build.without? 'vtk5'
+    if build.without? 'vtk'
       args << "-DCMAKE_DISABLE_FIND_PACKAGE_VTK:BOOL=TRUE"
     end
 
