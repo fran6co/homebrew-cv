@@ -67,7 +67,7 @@ class Pcl < Formula
     depends_on 'vtk' => :recommended
   end
   depends_on 'homebrew/science/openni' => :optional
-  depends_on 'totakke/openni2/openni2' => :optional
+  depends_on 'homebrew/science/openni2' => :optional
 
   resource 'sphinx' do
     url 'https://pypi.python.org/packages/source/S/Sphinx/Sphinx-1.2.2.tar.gz'
