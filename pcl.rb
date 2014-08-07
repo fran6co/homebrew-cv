@@ -114,8 +114,8 @@ class Pcl < Formula
     ]
 
     if build.head? and build.with? 'openni2'
-      ENV.append 'OPENNI2_INCLUDE', "#{HOMEBREW_PREFIX}/include/ni2"
-      ENV.append 'OPENNI2_REDIST', "#{HOMEBREW_PREFIX}/lib/ni2"
+      ENV.append 'OPENNI2_INCLUDE_DIRS', "#{HOMEBREW_PREFIX}/include/ni2"
+      ENV.append 'OPENNI2_LIBRARY', "#{HOMEBREW_PREFIX}/lib/ni2"
       args << "-DBUILD_OPENNI2:BOOL=ON"
     end
 
