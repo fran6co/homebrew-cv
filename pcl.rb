@@ -56,8 +56,7 @@ class Pcl < Formula
 
   depends_on CudaRequirement => :optional
 
-  # PCL doesn't support qhull 2012 yet
-  depends_on 'qhull2011'
+  depends_on 'qhull'
   depends_on 'libusb'
   depends_on 'glew'
   depends_on 'qt' => :recommended
@@ -91,7 +90,7 @@ class Pcl < Formula
     end
     fixes = []
     
-    # fixes GLEW linking and qhull2011
+    # fixes GLEW linking
     [DATA] + fixes
   end
 
@@ -102,11 +101,8 @@ class Pcl < Formula
 
     raise 'PCL currently requires --HEAD on Mavericks' if MacOS.version == :mavericks and not build.head?
 
-    qhull2011_base = Formula.factory('qhull2011').installed_prefix
-
     args = std_cmake_args + %W[
       -DGLEW_INCLUDE_DIR=#{HOMEBREW_PREFIX}/include/GL
-      -DQHULL_ROOT=#{qhull2011_base}
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_simulation:BOOL=AUTO_OFF
       -DBUILD_outofcore:BOOL=AUTO_OFF
@@ -199,26 +195,6 @@ class Pcl < Formula
   end
 end
 __END__
-diff --git a/cmake/Modules/FindQhull.cmake b/cmake/Modules/FindQhull.cmake
-index f5fd269..2d16436 100644
---- a/cmake/Modules/FindQhull.cmake
-+++ b/cmake/Modules/FindQhull.cmake
-@@ -47,12 +47,14 @@ find_library(QHULL_LIBRARY
-              NAMES ${QHULL_RELEASE_NAME}
-              HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
-              PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
-+             NO_DEFAULT_PATH
-              PATH_SUFFIXES project build bin lib)
- 
- find_library(QHULL_LIBRARY_DEBUG 
-              NAMES ${QHULL_DEBUG_NAME} ${QHULL_RELEASE_NAME}
-              HINTS "${QHULL_ROOT}" "$ENV{QHULL_ROOT}"
-              PATHS "$ENV{PROGRAMFILES}/QHull" "$ENV{PROGRAMW6432}/QHull" 
-+             NO_DEFAULT_PATH
-              PATH_SUFFIXES project build bin lib)
- 
- if(NOT QHULL_LIBRARY_DEBUG) 
-
 diff --git a/cmake/Modules/FindGLEW.cmake b/cmake/Modules/FindGLEW.cmake
 index f6c6e2a..f59a780 100644
 --- a/cmake/Modules/FindGLEW.cmake
