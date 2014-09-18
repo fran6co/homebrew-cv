@@ -5,12 +5,8 @@ Computer vision formulas
 
 To use this formulas:
 
-    brew tap fran6co/cv
+    brew tap homebrew/science
 
-If you tapped homebrew/science, install opencv with:
-   
-    brew install fran6co/cv/opencv
+To install 1.7.2 use
 
-To install 1.7.0 use
-
-    brew install pcl --HEAD
+    brew install pcl
