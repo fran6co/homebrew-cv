@@ -1,7 +1,7 @@
 homebrew-cv
 ===========
 
-Computer vision formulas
+Computer vision formulas (everything got merged into homebrew/science)
 
 To use this formulas:
 
